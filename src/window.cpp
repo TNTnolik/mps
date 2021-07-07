@@ -88,8 +88,8 @@ _builder(builder)
     rastMezhO_P->set_editable(false);
     d->configure(Gtk::Adjustment::create(26,0,MAX_INT,1,10,0),1,0);
     d1->configure(Gtk::Adjustment::create(10,0,MAX_INT,1,10,0),1,0);
-    d->configure(Gtk::Adjustment::create(1,0,MAX_INT,1,10,0),1,0);
-    d1->configure(Gtk::Adjustment::create(1,0,MAX_INT,1,10,0),1,0);
+    e->configure(Gtk::Adjustment::create(1,0,MAX_INT,1,10,0),1,0);
+    e1->configure(Gtk::Adjustment::create(1,0,MAX_INT,1,10,0),1,0);
 
 
     CountPoint->set_editable(false);
@@ -155,7 +155,7 @@ _builder(builder)
     xyz[0][1]->set_value(1000);
     xyz[1][1]->set_value(1000);
     xyz[2][0]->set_value(0);
-    xyz[2][2]->set_value(2000);
+    xyz[2][1]->set_value(2000);
 }
 
 
@@ -227,6 +227,10 @@ void window::raschet_dlin_shtang(){
         Lmin->set_value(lmin);
 
     }
+
+    Gtk::MessageDialog dia(*this, "Расчёт длин штанг.", false, Gtk::MESSAGE_INFO);
+    dia.set_secondary_text("Расчёт длин штанг окончен!");
+    dia.run();
 
 }
 
@@ -531,10 +535,10 @@ void window::alf_change(int alf_id, int alf_count, const Glib::RefPtr<Gtk::Adjus
 }
 
 void window::change_xyz() {
-    xyz[2][0]->set_value(0);
     for (int i = 0; i < 2; ++i) {
-        xyz[i][0]->set_value(-xyz[i][0]->get_value_as_int());
+        xyz[i][0]->set_value(-xyz[i][1]->get_value_as_int());
     }
+    xyz[2][0]->set_value(0);
 }
 
 bool window::fIsPresentZven(double xv, double yv, double hv) {
@@ -641,66 +645,77 @@ void window::RashetPloshadiSech(long n, double Prostr[3][100*100*100]) {
 
 void window::raschet_rab() {
     long int NumPoint, CountIsPres;
-
+    std::cout<<"-10 key\n";
     p = 0;
     step = 0;
 
-    long CountAllPoint = pow(CountPoint->get_value_as_int(),3);
+//    long CountAllPoint = pow(CountPoint->get_value_as_int(),3);
 
 
-    double RabPrX[CountAllPoint], RabPrY[CountAllPoint], RabPrH[CountAllPoint], RabPrIsPresent[CountAllPoint], PloshadSechMax, hh, yy, xx;
-    double Prostr[3][100*100*100];
-
-    hmin=xyz[0][0]->get_value()+rastMezhO_P->get_value_as_int();
-    hmax=xyz[0][1]->get_value()+rastMezhO_P->get_value_as_int();
-
-    step_h = (hmax-hmin)/(CountPoint->get_value()-1);
-    step_x = (xyz[0][1]->get_value_as_int()-xyz[0][0]->get_value_as_int())/(CountPoint->get_value()-1);
-    step_y = (xyz[1][1]->get_value_as_int()-xyz[1][0]->get_value_as_int())/(CountPoint->get_value()-1);
-
-    NumPoint=0;
-    for (int i = 0; i < CountPoint->get_value_as_int(); ++i) {
-        hh=hmin+i*step_h;
-        for (int j = 0; j < CountPoint->get_value_as_int(); ++j) {
-            yy=xyz[1][0]->get_value_as_int()+j*step_y;
-            for (int l = 0; l < CountPoint->get_value_as_int(); ++l) {
-                xx = xyz[0][0]->get_value_as_int()+l*step_x;
-                NumPoint=NumPoint+1;
-                RabPrX[NumPoint]=xx;
-                RabPrY[NumPoint]=yy;
-                RabPrH[NumPoint]=hh;
-                if(fIsPresentZven(xx,yy,hh)){
-                    RabPrIsPresent[NumPoint]=1;
-                } else {
-                    RabPrIsPresent[NumPoint]=0;
-                }
-            }
-        }
-    }
-    CountIsPres = 0;
-
-    for (int i = 0; i < NumPoint; ++i) {
-        if(RabPrIsPresent[i]){
-            CountIsPres = CountIsPres + 1;
-            Prostr[0][CountIsPres] = RabPrX[i];
-            Prostr[1][CountIsPres] = RabPrY[i];
-            Prostr[2][CountIsPres] = RabPrH[i];
-        }
-    }
-
-    RashetPloshadiSech(CountIsPres, Prostr);
-
-    PloshadSechMax = PloshadiSech[0] * step_x * step_y;
-    for (int i = 1; i < Nz; ++i) {
-        if(PloshadiSech[i] * step_x * step_y > PloshadSechMax) {
-            PloshadSechMax = PloshadiSech[i] * step_x * step_y;
-        }
-    }
-    std::cout<<PloshadSechMax;
-
-    VV=0;
-    for (int i = 0; i < Nz; ++i) {
-        VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
-    }
-    std::cout<<std::endl<<VV;
+//    float RabPrX[3][CountPoint->get_value_as_int()], RabPrY[3][CountPoint->get_value_as_int()],
+//    RabPrH[3][CountPoint->get_value_as_int()], RabPrIsPresent[3][CountPoint->get_value_as_int()],
+//    PloshadSechMax, hh, yy, xx;
+//
+//    double Prostr[3][3][CountPoint->get_value_as_int()];
+//
+//    std::cout << "EEEEEY! ";
+//    try {
+//
+//
+//        hmin=xyz[0][0]->get_value()+rastMezhO_P->get_value_as_int();
+//        hmax=xyz[0][1]->get_value()+rastMezhO_P->get_value_as_int();
+//
+//        step_h = (hmax-hmin)/(CountPoint->get_value()-1);
+//        step_x = (xyz[0][1]->get_value_as_int()-xyz[0][0]->get_value_as_int())/(CountPoint->get_value()-1);
+//        step_y = (xyz[1][1]->get_value_as_int()-xyz[1][0]->get_value_as_int())/(CountPoint->get_value()-1);
+//
+//        NumPoint=0;
+//        for (int i = 0; i < CountPoint->get_value_as_int(); ++i) {
+//            hh=hmin+i*step_h;
+//            for (int j = 0; j < CountPoint->get_value_as_int(); ++j) {
+//                yy=xyz[1][0]->get_value_as_int()+j*step_y;
+//                for (int l = 0; l < CountPoint->get_value_as_int(); ++l) {
+//                    xx = xyz[0][0]->get_value_as_int()+l*step_x;
+//                    NumPoint=NumPoint+1;
+//                    RabPrX[NumPoint]=xx;
+//                    RabPrY[NumPoint]=yy;
+//                    RabPrH[NumPoint]=hh;
+//                    if(fIsPresentZven(xx,yy,hh)){
+//                        RabPrIsPresent[NumPoint]=1;
+//                    } else {
+//                        RabPrIsPresent[NumPoint]=0;
+//                    }
+//                }
+//            }
+//        }
+//        CountIsPres = 0;
+//
+//        std::cout<<"1 key\n";
+//        for (int i = 0; i < NumPoint; ++i) {
+//            if(RabPrIsPresent[i]){
+//                CountIsPres = CountIsPres + 1;
+//                Prostr[0][CountIsPres] = RabPrX[i];
+//                Prostr[1][CountIsPres] = RabPrY[i];
+//                Prostr[2][CountIsPres] = RabPrH[i];
+//            }
+//        }
+//        std::cout<<"2 key\n";
+//        RashetPloshadiSech(CountIsPres, Prostr);
+//        std::cout<<"3 key\n";
+//        PloshadSechMax = PloshadiSech[0] * step_x * step_y;
+//        for (int i = 1; i < Nz; ++i) {
+//            if(PloshadiSech[i] * step_x * step_y > PloshadSechMax) {
+//                PloshadSechMax = PloshadiSech[i] * step_x * step_y;
+//            }
+//        }
+//        std::cout<<PloshadSechMax;
+//
+//        VV=0;
+//        for (int i = 0; i < Nz; ++i) {
+//            VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
+//        }
+//        std::cout<<std::endl<<VV;
+//    } catch(...) {
+//        std::cout << "ERROR";
+//    }
 }
