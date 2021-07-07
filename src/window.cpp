@@ -649,16 +649,21 @@ void window::raschet_rab() {
     p = 0;
     step = 0;
 
-//    long CountAllPoint = pow(CountPoint->get_value_as_int(),3);
+    long CountAllPoint = pow(CountPoint->get_value_as_int(),3);
 
 
-//    float RabPrX[3][CountPoint->get_value_as_int()], RabPrY[3][CountPoint->get_value_as_int()],
-//    RabPrH[3][CountPoint->get_value_as_int()], RabPrIsPresent[3][CountPoint->get_value_as_int()],
-//    PloshadSechMax, hh, yy, xx;
-//
-//    double Prostr[3][3][CountPoint->get_value_as_int()];
-//
-//    std::cout << "EEEEEY! ";
+    float *RabPrX, *RabPrY, *RabPrH, *RabPrIsPresent, **Prostr, PloshadSechMax, hh, yy, xx;
+    RabPrX = new float[CountAllPoint];
+    RabPrY = new float[CountAllPoint];
+    RabPrH = new float[CountAllPoint];
+    RabPrIsPresent = new float[CountAllPoint];
+    Prostr = new float* [3];
+    for (int i = 0; i < 3; ++i) {
+        Prostr[i] = new float[CountAllPoint];
+    }
+
+
+    std::cout << "EEEEEY! ";
 //    try {
 //
 //
@@ -715,7 +720,7 @@ void window::raschet_rab() {
 //            VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
 //        }
 //        std::cout<<std::endl<<VV;
-//    } catch(...) {
-//        std::cout << "ERROR";
-//    }
+    } catch(...) {
+        std::cout << "ERROR";
+    }
 }
