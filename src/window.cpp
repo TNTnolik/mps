@@ -143,7 +143,9 @@ _builder(builder)
         xyz[i][0]->set_editable(false);
         xyz[i][0]->set_increments(0,0);
     }
-
+    for (int i = 0; i < 6; ++i) {
+        heightSh[i]->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this, &window::hSh_change), i, heightSh[i]->get_adjustment()));
+    }
 
 
     rasch_rab->signal_clicked().connect(sigc::mem_fun(*this, &window::raschet_rab));
@@ -156,6 +158,12 @@ _builder(builder)
     xyz[1][1]->set_value(1000);
     xyz[2][0]->set_value(0);
     xyz[2][1]->set_value(2000);
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 6; ++j) {
+            alf[i][j]=0;
+        }
+    }
+    for (int i = 0; i < 6; ++i) hSh[i]=0;
 }
 
 
@@ -234,12 +242,6 @@ void window::raschet_dlin_shtang(){
 
 }
 
-double window::fDlinaShtan(double r1, double r, double Lx, double Ly, double Lz, double alfa, double alfao,
-                           double vsharnapla) {
-    return sqrt(pow((r1 * cos(alfa) * k[0][0] + r1 * sin(alfa) * k[0][1] + 0 * k[0][2] + 1 * k[0][3] + Lx -
-    ((r) * cos(alfao))), 2) + pow(((r1 * cos(alfa) * k[1][0] + r1 * sin(alfa) * k[1][1] + 0 * k[1][2] + k[1][3] +
-    Ly - ((r) * sin(alfao)))), 2) + pow((r1 * cos(alfa) * k[2][0] + r1 * sin(alfa) * k[2][1] + k[2][3] + Lz + vsharnapla), 2));
-}
 
 void window::change_R() {
     if(OsnRr->get_value()!=0){
@@ -303,6 +305,7 @@ void window::change_comType() {
             }
             L_dis();
             for (int i = 0; i < CountHtang->get_value_as_int(); ++i) {
+                std::cout<<i;
                 alfo[i]->set_value(360/CountHtang->get_value_as_int()*i);
                 alfp[i]->set_value(360/CountHtang->get_value_as_int()*i);
             }
@@ -530,8 +533,16 @@ void window::L_dis() {
     Lo->set_increments(0,0);
 }
 
+void window::hSh_change(int id, const Glib::RefPtr<Gtk::Adjustment> &adj) {
+    hSh[id] = adj->get_value();
+}
+
 void window::alf_change(int alf_id, int alf_count, const Glib::RefPtr<Gtk::Adjustment> &adj) {
-    alf[alf_id][alf_count] = adj->get_value()*M_PI/180;
+    if(adj->get_value()!=0) {
+        alf[alf_id][alf_count] = adj->get_value() * M_PI / 180;
+    } else {
+        alf[alf_id][alf_count] = 0;
+    }
 }
 
 void window::change_xyz() {
@@ -541,9 +552,12 @@ void window::change_xyz() {
     xyz[2][0]->set_value(0);
 }
 
-bool window::fIsPresentZven(double xv, double yv, double hv) {
-    double *DlinaShtang = new double [CountHtang->get_value_as_int()];
-    double amaxpl[CountHtang->get_value_as_int()], amaxo[CountHtang->get_value_as_int()], aminpl[CountHtang->get_value_as_int()], amino[CountHtang->get_value_as_int()];
+bool window::fIsPresentZven(float xv, float yv, float hv) {
+    float *DlinaShtang = new float [CountHtang->get_value_as_int()];
+    float *amaxpl = new float [CountHtang->get_value_as_int()];
+    float *amaxo = new float [CountHtang->get_value_as_int()];
+    float *aminpl = new float [CountHtang->get_value_as_int()];
+    float *amino = new float [CountHtang->get_value_as_int()];
 
     switch (SharType->get_active_row_number()) {
         case 0:
@@ -602,45 +616,54 @@ bool window::fIsPresentZven(double xv, double yv, double hv) {
     k[2][2] = floorf(k[2][2]*100)/100;
     k[2][3]=hv;
 
+
+
     for (int i = 0; i < CountHtang->get_value_as_int(); ++i) {
-        DlinaShtang[i]= fDlinaShtan(Plat_r->get_value(), (OsnR->get_value()+p*step), 0, 0, 0, alf[1][i], alf[0][i], heightSh[i]->get_value());
+        DlinaShtang[i] = fDlinaShtan(Plat_r->get_value(), (OsnR->get_value()+p*step), 0, 0, 0, alf[1][i], alf[0][i], hSh[i]);
         if(DlinaShtang[i]<lmin || DlinaShtang[i]>lmax){
             return false;
-            break;
         }else{
-            double a= asin((Plat_r->get_value()*k[2][0]+k[2][3]+heightSh[i]->get_value()))/DlinaShtang[i];
+            double a= asin((Plat_r->get_value()*k[2][0]+k[2][3]+hSh[i]))/DlinaShtang[i];
             if(((a < aminpl[i]) || (a > amaxpl[i])) || ((a < amino[i]) || (a > amaxo[i]))){
                 return false;
-                break;
             }
         }
     }
     return true;
+
+    delete[] DlinaShtang, amaxo, amaxpl, amino, aminpl;
 }
 
-void window::RashetPloshadiSech(long n, double Prostr[3][100*100*100]) {
-    bool IsTrue;
-    Nz=0;
-    for (int i = 0; i < n; ++i) {
-        IsTrue=false;
-        for (int j = 0; j < Nz; ++j) {
-            if(Prostr[2][i]==mZ[j]){
-                IsTrue= true;
-            }
-        }
-        if(!IsTrue){
-            Nz+=1;
-            mZ[Nz]=Prostr[3][i];
-        }
-    }
-    for (int i = 0; i < Nz; ++i) {
-        for (int j = 0; j < n; ++j) {
-            if(Prostr[3][j]==mZ[i]){
-                PloshadiSech[i]+=1;
-            }
-        }
+double window::fDlinaShtan(double r1, double r, double Lx, double Ly, double Lz, double alfa, double alfao,
+                           double vsharnapla) {
+    return sqrt(pow((r1 * cos(alfa) * k[0][0] + r1 * sin(alfa) * k[0][1] + 0 * k[0][2] + 1 * k[0][3] + Lx -
+    ((r) * cos(alfao))), 2) + pow(((r1 * cos(alfa) * k[1][0] + r1 * sin(alfa) * k[1][1] + 0 * k[1][2] + k[1][3] +
+    Ly - ((r) * sin(alfao)))), 2) + pow((r1 * cos(alfa) * k[2][0] + r1 * sin(alfa) * k[2][1] + k[2][3] + Lz + vsharnapla), 2));
+}
 
-    }
+void window::RashetPloshadiSech(long n, float **Prostr) {
+    bool IsTrue;
+//    Nz=0;
+//    for (int i = 0; i < n; ++i) {
+//        IsTrue=false;
+//        for (int j = 0; j < Nz; ++j) {
+//            if(Prostr[2][i]==mZ[j]){
+//                IsTrue= true;
+//            }
+//        }
+//        if(!IsTrue){
+//            Nz+=1;
+//            mZ[Nz]=Prostr[3][i];
+//        }
+//    }
+//    for (int i = 0; i < Nz; ++i) {
+//        for (int j = 0; j < n; ++j) {
+//            if(Prostr[3][j]==mZ[i]){
+//                PloshadiSech[i]+=1;
+//            }
+//        }
+//
+//    }
 }
 
 void window::raschet_rab() {
@@ -663,50 +686,50 @@ void window::raschet_rab() {
     }
 
 
-    std::cout << "EEEEEY! ";
-//    try {
-//
-//
-//        hmin=xyz[0][0]->get_value()+rastMezhO_P->get_value_as_int();
-//        hmax=xyz[0][1]->get_value()+rastMezhO_P->get_value_as_int();
-//
-//        step_h = (hmax-hmin)/(CountPoint->get_value()-1);
-//        step_x = (xyz[0][1]->get_value_as_int()-xyz[0][0]->get_value_as_int())/(CountPoint->get_value()-1);
-//        step_y = (xyz[1][1]->get_value_as_int()-xyz[1][0]->get_value_as_int())/(CountPoint->get_value()-1);
-//
-//        NumPoint=0;
-//        for (int i = 0; i < CountPoint->get_value_as_int(); ++i) {
-//            hh=hmin+i*step_h;
-//            for (int j = 0; j < CountPoint->get_value_as_int(); ++j) {
-//                yy=xyz[1][0]->get_value_as_int()+j*step_y;
-//                for (int l = 0; l < CountPoint->get_value_as_int(); ++l) {
-//                    xx = xyz[0][0]->get_value_as_int()+l*step_x;
-//                    NumPoint=NumPoint+1;
-//                    RabPrX[NumPoint]=xx;
-//                    RabPrY[NumPoint]=yy;
-//                    RabPrH[NumPoint]=hh;
-//                    if(fIsPresentZven(xx,yy,hh)){
-//                        RabPrIsPresent[NumPoint]=1;
-//                    } else {
-//                        RabPrIsPresent[NumPoint]=0;
-//                    }
-//                }
-//            }
-//        }
-//        CountIsPres = 0;
-//
-//        std::cout<<"1 key\n";
-//        for (int i = 0; i < NumPoint; ++i) {
-//            if(RabPrIsPresent[i]){
-//                CountIsPres = CountIsPres + 1;
-//                Prostr[0][CountIsPres] = RabPrX[i];
-//                Prostr[1][CountIsPres] = RabPrY[i];
-//                Prostr[2][CountIsPres] = RabPrH[i];
-//            }
-//        }
-//        std::cout<<"2 key\n";
-//        RashetPloshadiSech(CountIsPres, Prostr);
-//        std::cout<<"3 key\n";
+
+
+    hmin=xyz[0][0]->get_value()+rastMezhO_P->get_value_as_int();
+    hmax=xyz[0][1]->get_value()+rastMezhO_P->get_value_as_int();
+
+    step_h = (hmax-hmin)/(CountPoint->get_value()-1);
+    step_x = (xyz[0][1]->get_value_as_int()-xyz[0][0]->get_value_as_int())/(CountPoint->get_value()-1);
+    step_y = (xyz[1][1]->get_value_as_int()-xyz[1][0]->get_value_as_int())/(CountPoint->get_value()-1);
+
+
+    NumPoint=0;
+    for (int i = 0; i < CountPoint->get_value_as_int(); ++i) {
+        hh=hmin+i*step_h;
+        for (int j = 0; j < CountPoint->get_value_as_int(); ++j) {
+            yy=xyz[1][0]->get_value_as_int()+j*step_y;
+            for (int l = 0; l < CountPoint->get_value_as_int(); ++l) {
+                xx = xyz[0][0]->get_value_as_int()+l*step_x;
+                NumPoint=NumPoint+1;
+                RabPrX[NumPoint]=xx;
+                RabPrY[NumPoint]=yy;
+                RabPrH[NumPoint]=hh;
+                if(fIsPresentZven(xx,yy,hh)){
+                    RabPrIsPresent[NumPoint]=1;
+                } else {
+                    RabPrIsPresent[NumPoint]=0;
+                }
+            }
+        }
+    }
+
+        CountIsPres = 0;
+
+        std::cout<<"1 key\n";
+        for (int i = 0; i < NumPoint; ++i) {
+            if(RabPrIsPresent[i]){
+                CountIsPres = CountIsPres + 1;
+                Prostr[0][CountIsPres] = RabPrX[i];
+                Prostr[1][CountIsPres] = RabPrY[i];
+                Prostr[2][CountIsPres] = RabPrH[i];
+            }
+        }
+        std::cout<<"2 key\n";
+        RashetPloshadiSech(CountIsPres, Prostr);
+        std::cout<<"3 key\n";
 //        PloshadSechMax = PloshadiSech[0] * step_x * step_y;
 //        for (int i = 1; i < Nz; ++i) {
 //            if(PloshadiSech[i] * step_x * step_y > PloshadSechMax) {
@@ -720,7 +743,4 @@ void window::raschet_rab() {
 //            VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
 //        }
 //        std::cout<<std::endl<<VV;
-    } catch(...) {
-        std::cout << "ERROR";
-    }
 }
