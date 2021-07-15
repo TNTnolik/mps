@@ -33,7 +33,7 @@ protected:
     double fDlinaShtan(double r1, double r, double Lx, double Ly, double Lz, double alfa, double alfao, double vsharnapla);
 
 
-    long MAX_INT = 9999999999;
+    long MAX_INT = 999999999;
     long int NMaxSech = 1000, p, Nz;
     double k[4][4], mZ[1000], PloshadiSech[1000], VV, Vmin, Vmax, dmin, dmax, Shmin, Shmax, step_V, step_Dl, step_Sh, lmin, lmax, arash, alf[2][6], hSh[6], hmin, hmax, step_h, step_x, step_y, step;
     Glib::RefPtr<Gtk::Builder> _builder;

@@ -643,7 +643,7 @@ double window::fDlinaShtan(double r1, double r, double Lx, double Ly, double Lz,
 
 void window::RashetPloshadiSech(long n, float **Prostr) {
     bool IsTrue;
-//    Nz=0;
+    Nz=0;
 //    for (int i = 0; i < n; ++i) {
 //        IsTrue=false;
 //        for (int j = 0; j < Nz; ++j) {
