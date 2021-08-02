@@ -1,6 +1,7 @@
 #ifndef MPS_WINDOW_H
 #define MPS_WINDOW_H
 
+
 #include <iostream>
 #include <math.h>
 #include <gtkmm.h>

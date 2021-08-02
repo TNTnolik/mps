@@ -164,6 +164,8 @@ _builder(builder)
         }
     }
     for (int i = 0; i < 6; ++i) hSh[i]=0;
+    for (int i = 0; i < NMaxSech; ++i) mZ[i]=0;
+    for (int i = 0; i < NMaxSech; ++i) PloshadiSech[i]=0;
 }
 
 
@@ -172,27 +174,18 @@ void window::raschet_dlin_shtang(){
     double *DlinaShtang = new double [CountHtang->get_value_as_int()];
     //Первая строка
     k[0][0]=cos(anglPlatY->get_value()*M_PI/180)*cos(anglPlatZ->get_value()*M_PI/180);
-    k[0][0]=floorf(k[0][0]*100)/100;
     k[0][1]=-1 * cos(anglPlatY->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180);
-    k[0][1]=floorf(k[0][1]*100)/100;
     k[0][2]=sin(anglPlatY->get_value()*M_PI/180);
-    k[0][2]=floorf(k[0][2]*100)/100;
     k[0][3]=Sh->get_value();
     //Вторая строка
     k[1][0] = sin(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180) + cos(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180);
-    k[1][0] = floorf(k[1][0]*100)/100;
     k[1][1] = -1 * sin(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180) + cos(anglPlatX->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180);
-    k[1][1] = floorf(k[1][1]*100)/100;
     k[1][2] = -1 * sin(anglPlatX->get_value() * M_PI / 180) * cos(anglPlatY->get_value() * M_PI / 180);
-    k[1][2] = floorf(k[1][2]*100)/100;
     k[1][3]=D->get_value();
     //Третья строка
     k[2][0] = -1 * cos(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180) + sin(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180);
-    k[2][0] = floorf(k[2][0]*100)/100;
     k[2][1] = cos(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180) + sin(anglPlatZ->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180);
-    k[2][1] = floorf(k[2][1]*100)/100;
     k[2][2] = cos(anglPlatX->get_value() * M_PI / 180) * cos(anglPlatY->get_value() * M_PI / 180);
-    k[2][2] = floorf(k[2][2]*100)/100;
     k[2][3]=V->get_value();
     //Четвёртая строка
     k[3][0]=0;
@@ -593,27 +586,18 @@ bool window::fIsPresentZven(float xv, float yv, float hv) {
     }
 
     k[0][0]=cos(anglPlatY->get_value()*M_PI/180)*cos(anglPlatZ->get_value()*M_PI/180);
-    k[0][0]=floorf(k[0][0]*100)/100;
     k[0][1]=-cos(anglPlatY->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180);
-    k[0][1]=floorf(k[0][1]*100)/100;
     k[0][2]=sin(anglPlatY->get_value()*M_PI/180);
-    k[0][2]=floorf(k[0][2]*100)/100;
     k[0][3]=xv;
     //Вторая строка
     k[1][0] = sin(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180) + cos(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180);
-    k[1][0] = floorf(k[1][0]*100)/100;
     k[1][1] = -sin(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180) + cos(anglPlatX->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180);
-    k[1][1] = floorf(k[1][1]*100)/100;
     k[1][2] = -sin(anglPlatX->get_value() * M_PI / 180) * cos(anglPlatY->get_value() * M_PI / 180);
-    k[1][2] = floorf(k[1][2]*100)/100;
     k[1][3]=yv;
     //Третья строка
     k[2][0] = -cos(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180) + sin(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180);
-    k[2][0] = floorf(k[2][0]*100)/100;
     k[2][1] = cos(anglPlatX->get_value() * M_PI / 180) * sin(anglPlatY->get_value() * M_PI / 180) * sin(anglPlatZ->get_value() * M_PI / 180) + sin(anglPlatZ->get_value() * M_PI / 180) * cos(anglPlatZ->get_value() * M_PI / 180);
-    k[2][1] = floorf(k[2][1]*100)/100;
     k[2][2] = cos(anglPlatX->get_value() * M_PI / 180) * cos(anglPlatY->get_value() * M_PI / 180);
-    k[2][2] = floorf(k[2][2]*100)/100;
     k[2][3]=hv;
 
 
@@ -644,26 +628,26 @@ double window::fDlinaShtan(double r1, double r, double Lx, double Ly, double Lz,
 void window::RashetPloshadiSech(long n, float **Prostr) {
     bool IsTrue;
     Nz=0;
-//    for (int i = 0; i < n; ++i) {
-//        IsTrue=false;
-//        for (int j = 0; j < Nz; ++j) {
-//            if(Prostr[2][i]==mZ[j]){
-//                IsTrue= true;
-//            }
-//        }
-//        if(!IsTrue){
-//            Nz+=1;
-//            mZ[Nz]=Prostr[3][i];
-//        }
-//    }
-//    for (int i = 0; i < Nz; ++i) {
-//        for (int j = 0; j < n; ++j) {
-//            if(Prostr[3][j]==mZ[i]){
-//                PloshadiSech[i]+=1;
-//            }
-//        }
-//
-//    }
+    for (int i = 0; i < n; ++i) {
+        IsTrue=false;
+        for (int j = 0; j < Nz; ++j) {
+            if(Prostr[2][i]==mZ[j]){
+                IsTrue= true;
+            }
+        }
+        if(!IsTrue){
+            Nz+=1;
+            mZ[Nz]=Prostr[2][i];
+        }
+    }
+    for (int i = 0; i < Nz; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if(Prostr[2][j]==mZ[i]){
+                PloshadiSech[i]+=1;
+            }
+        }
+
+    }
 }
 
 void window::raschet_rab() {
@@ -730,17 +714,17 @@ void window::raschet_rab() {
         std::cout<<"2 key\n";
         RashetPloshadiSech(CountIsPres, Prostr);
         std::cout<<"3 key\n";
-//        PloshadSechMax = PloshadiSech[0] * step_x * step_y;
-//        for (int i = 1; i < Nz; ++i) {
-//            if(PloshadiSech[i] * step_x * step_y > PloshadSechMax) {
-//                PloshadSechMax = PloshadiSech[i] * step_x * step_y;
-//            }
-//        }
-//        std::cout<<PloshadSechMax;
-//
-//        VV=0;
-//        for (int i = 0; i < Nz; ++i) {
-//            VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
-//        }
-//        std::cout<<std::endl<<VV;
+        PloshadSechMax = PloshadiSech[0] * step_x * step_y;
+        for (int i = 1; i < Nz; ++i) {
+            if(PloshadiSech[i] * step_x * step_y > PloshadSechMax) {
+                PloshadSechMax = PloshadiSech[i] * step_x * step_y;
+            }
+        }
+        std::cout<<step_x<<" "<<step_y<<" "<<step_h;
+
+        VV=0;
+        for (int i = 0; i < Nz; ++i) {
+            VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
+        }
+        std::cout<<std::endl<<VV;
 }
