@@ -41,6 +41,7 @@ protected:
     Gtk::Button *raschet_dlin, *rasch_rab;
     Gtk::ComboBoxText *comType, *SharType;
     Gtk::Image *comTypeImg;
+    Gtk::Entry *MaxS, *Vrab;
     Gtk::SpinButton *OsnR, *e, *e1, *d1, *d, *OsnRr, *Plat_r, *CountHtang, *anglRas, *rHarnOsn, *rHarnPla, *Sh, *D, *V, *CountPoint, *anglPlatX, *anglPlatY, *anglPlatZ,*alfo[6], *alfp[6], *Lo, *Lp, *L, *Lmin, *Lmax, *heightSh[6], *xyz[3][2], *rastMezhO_P;
 
 };

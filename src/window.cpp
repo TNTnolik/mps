@@ -43,6 +43,10 @@ _builder(builder)
     _builder->get_widget("d1", d1);
     _builder->get_widget("e", e);
     _builder->get_widget("e1", e1);
+    _builder->get_widget("Vrab", Vrab);
+    _builder->get_widget("MaxS", MaxS);
+    Vrab->set_editable(false);
+    MaxS->set_editable(false);
 
     for (int i = 0; i < 6; ++i) {
         std::string temp = "alfo";
@@ -720,11 +724,12 @@ void window::raschet_rab() {
                 PloshadSechMax = PloshadiSech[i] * step_x * step_y;
             }
         }
-        std::cout<<step_x<<" "<<step_y<<" "<<step_h;
+
+        MaxS->set_text(std::to_string(PloshadSechMax));
 
         VV=0;
         for (int i = 0; i < Nz; ++i) {
             VV = VV + PloshadiSech[i] * step_x * step_y * step_h;
         }
-        std::cout<<std::endl<<VV;
+        Vrab->set_text(std::to_string(VV));
 }
